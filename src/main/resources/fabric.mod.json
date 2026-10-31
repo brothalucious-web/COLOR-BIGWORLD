@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "colorbigworld",
+  "version": "${version}",
+  "name": "COLOR BIGWORLD",
+  "description": "Color-group restoration challenge with 30-second monochrome cycles.",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "dev.bigworld.ColorBigworld"
+    ],
+    "client": [
+      "dev.bigworld.ColorBigworldClient"
+    ]
+  },
+  "mixins": [
+    "colorbigworld.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.7",
+    "minecraft": "1.21.2",
+    "java": ">=21"
+  }
+}
