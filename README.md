@@ -1,21 +1,22 @@
-# COLOR-BIGWORLD — DIAGNOSTIC BRANCH ONLY
+# COLOR-BIGWORLD — COLOR RESTORATION V2 EXPERIMENT
 
-**This is not the finished gameplay mod.** The existing `main` branch has not been changed.
+**Test branch:** `experimental/color-restoration-v2`. Your main branch and proven magenta diagnostic are untouched.
 
-## Why this branch exists
-Prior releases compiled, but the user reports that no intended color-changing behavior appeared. This version isolates rendering from gameplay rules.
+## Proven by user
+The magenta diagnostic shader visibly turned the world purple in-game, confirming the pipeline can render a custom fragment shader.
 
-- The fragment shader is deliberately an obvious **magenta grayscale**.
-- The shader should be visible immediately on joining a world.
-- It does **not** attempt restoration, death, group consistency, 45/55 distribution, or a 30-second reset.
-- It retains the existing once-per-world GameRenderer mixin.
-- HUD elements are not affected because Minecraft applies post-effects before the HUD.
+## What this experimental build tries
+- Restores **groups of similar original RGB colors at once**, not random pixels. Each group consistently chooses original color (45% probability) or a randomly chosen replacement (55% probability).
+- Instant transitions with no fading.
+- Before each selected group restores, pixels in that group appear grayscale.
+- Both original and random restorations count visually.
 
-## Test
-1. Download the latest successful build artifact from GitHub Actions for this branch.
-2. Use Minecraft Java **1.21.2**, Fabric Loader, and Fabric API.
-3. Remove other COLOR-BIGWORLD jar versions from the mods folder.
-4. Enter a world. If the world image does **not** turn bright magenta-tinted grayscale, the post-processing pipeline isn't applied or fails to load.
-5. If not visible, provide `logs/latest.log` and any resource-reload error. If visible, the pipeline works and the color state logic can be rebuilt against this verified path.
+## Important remaining work
+- GameTime is not an independent 30-second clock; changing world time affects progression.
+- No first-30-seconds normal-world startup.
+- A source RGB grouping is not a block/material grouping.
+- Restoration is currently by color-group thresholds, not precise percentage of screen/world colored area.
+- **No 85% visual-area death trigger.** It was intentionally disabled rather than falsely killing players at a timer threshold.
+- No in-game verification on this branch; this is a visually testable experimental shader.
 
-A GitHub Actions build checks compilation and packaging only. **No in-game validation has been performed.**
+Build with GitHub Actions; use Minecraft 1.21.2, Fabric Loader, Fabric API and only one COLOR-BIGWORLD jar.
