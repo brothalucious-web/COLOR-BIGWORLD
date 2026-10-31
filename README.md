@@ -1,22 +1,21 @@
-# COLOR-BIGWORLD — Fabric 1.21.2
+# COLOR-BIGWORLD — DIAGNOSTIC BRANCH ONLY
 
-## Repair status
-This is an **experimental prototype, not the fully requested mod**.
+**This is not the finished gameplay mod.** The existing `main` branch has not been changed.
 
-Fixed:
-- GameRenderer no longer reinstalls the post-processing effect on **every single rendered frame**.
-- Removed the timer-based player kill that falsely claimed to implement 85% color restoration.
-- Retained instant grayscale-to-color shader prototype and 45% original/55% random RGB-key selection.
+## Why this branch exists
+Prior releases compiled, but the user reports that no intended color-changing behavior appeared. This version isolates rendering from gameplay rules.
 
-Not fixed / not implemented:
-- The first 30 seconds must stay fully colored.
-- Real, independent 30-second grayscale resets; the shader still uses the Minecraft day clock.
-- Block/material semantic color groups (e.g. every grass or tree of matching original colors).
-- Exact 85% of visual-world color coverage measured by the renderer and triggering death.
-- Synchronizing restoration across multiplayer clients or covering HUD/UI.
-- In-game verification. A successful GitHub Actions build verifies **compilation only**.
+- The fragment shader is deliberately an obvious **magenta grayscale**.
+- The shader should be visible immediately on joining a world.
+- It does **not** attempt restoration, death, group consistency, 45/55 distribution, or a 30-second reset.
+- It retains the existing once-per-world GameRenderer mixin.
+- HUD elements are not affected because Minecraft applies post-effects before the HUD.
 
-Run the automated build under **Actions** in this repository and inspect the log before installing the jar. Requires Java 21, Fabric Loader and Fabric API for Minecraft 1.21.2. GitHub Actions uploads a jar artifact on success.
+## Test
+1. Download the latest successful build artifact from GitHub Actions for this branch.
+2. Use Minecraft Java **1.21.2**, Fabric Loader, and Fabric API.
+3. Remove other COLOR-BIGWORLD jar versions from the mods folder.
+4. Enter a world. If the world image does **not** turn bright magenta-tinted grayscale, the post-processing pipeline isn't applied or fails to load.
+5. If not visible, provide `logs/latest.log` and any resource-reload error. If visible, the pipeline works and the color state logic can be rebuilt against this verified path.
 
-Minecraft 1.21.2 post-processing technical specification:
-https://www.minecraft.net/en-us/article/minecraft-java-edition-1-21-2
+A GitHub Actions build checks compilation and packaging only. **No in-game validation has been performed.**
