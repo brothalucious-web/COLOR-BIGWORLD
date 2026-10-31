@@ -1,5 +1,6 @@
 package dev.bigworld.mixin;
 
+import dev.bigworld.ColorBigworldClient;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.world.ClientWorld;
@@ -11,20 +12,25 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/** Only installs the effect when a new client world is loaded. */
+/**
+ * Installs once per world after a normal-color introduction.
+ * Does not reinstall on every render frame.
+ */
 @Mixin(GameRenderer.class)
 public abstract class GameRendererMixin {
     @Shadow private void setPostProcessor(Identifier id) {}
-    @Unique private ClientWorld colorbigworld$previousWorld;
+    @Unique private ClientWorld colorbigworld$installedWorld;
 
     @Inject(method = "render", at = @At("HEAD"))
     private void colorbigworld$activate(CallbackInfo ci) {
-        ClientWorld current = MinecraftClient.getInstance().world;
-        if (current != colorbigworld$previousWorld) {
-            colorbigworld$previousWorld = current;
-            if (current != null) {
-                setPostProcessor(Identifier.of("colorbigworld", "restoration"));
-            }
+        ClientWorld world = MinecraftClient.getInstance().world;
+        if (world == null) {
+            colorbigworld$installedWorld = null;
+            return;
+        }
+        if (ColorBigworldClient.shouldActivate() && world != colorbigworld$installedWorld) {
+            colorbigworld$installedWorld = world;
+            setPostProcessor(Identifier.of("colorbigworld", "restoration"));
         }
     }
 }
