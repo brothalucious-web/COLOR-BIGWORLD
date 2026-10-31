@@ -1,22 +1,18 @@
-# COLOR-BIGWORLD — Fabric 1.21.2
+# COLOR-BIGWORLD (Fabric 1.21.2) — experimental branch
 
-## Repair status
-This is an **experimental prototype, not the fully requested mod**.
+This branch deliberately preserves the last confirmed compiling version on `main`.
 
-Fixed:
-- GameRenderer no longer reinstalls the post-processing effect on **every single rendered frame**.
-- Removed the timer-based player kill that falsely claimed to implement 85% color restoration.
-- Retained instant grayscale-to-color shader prototype and 45% original/55% random RGB-key selection.
+## Change in this branch
+- World loads with ordinary Minecraft colors for **600 active client ticks** (~30 seconds at 20 TPS).
+- Only after that initial period does it install the existing restoration post-effect.
+- Rendering does not reinstall the post-effect every frame.
+- A fresh world starts a fresh 600-tick introduction.
 
-Not fixed / not implemented:
-- The first 30 seconds must stay fully colored.
-- Real, independent 30-second grayscale resets; the shader still uses the Minecraft day clock.
-- Block/material semantic color groups (e.g. every grass or tree of matching original colors).
-- Exact 85% of visual-world color coverage measured by the renderer and triggering death.
-- Synchronizing restoration across multiplayer clients or covering HUD/UI.
-- In-game verification. A successful GitHub Actions build verifies **compilation only**.
+## Not yet implemented correctly
+- Every 30-second grayscale reset using an independent client cycle.
+- Reliable material-level world color groups (grass, foliage, etc.).
+- Accurate measurement of restored visual coverage and death at 85%.
+- The shader's own color cycle still uses GameTime; it is a prototype.
+- In-game testing. CI passing only proves the mod compiles.
 
-Run the automated build under **Actions** in this repository and inspect the log before installing the jar. Requires Java 21, Fabric Loader and Fabric API for Minecraft 1.21.2. GitHub Actions uploads a jar artifact on success.
-
-Minecraft 1.21.2 post-processing technical specification:
-https://www.minecraft.net/en-us/article/minecraft-java-edition-1-21-2
+The threshold must never be approximated by '85% elapsed time' or '85% groups correct'.
