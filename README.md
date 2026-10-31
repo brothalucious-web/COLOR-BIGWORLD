@@ -1,19 +1,22 @@
-# COLOR-BIGWORLD — Fabric 1.21.2 (experimental)
+# COLOR-BIGWORLD — Fabric 1.21.2
 
-## Current implementation
-- Fully monochrome at the beginning of every **30-second / 600-tick** shader cycle.
-- Instant, discrete changes; **no fades**.
-- Restored color groups share a quantized source-RGB key throughout a frame.
-- Color-group choice is **45% original / 55% recolored**; both count as colored.
-- Pixel-level restoration is probabilistic across the **visible image**, not a percentage of correctly restored groups.
-- The post-effect is applied to the world image, **before Minecraft draws HUD/UI**.
+## Repair status
+This is an **experimental prototype, not the fully requested mod**.
 
-## IMPORTANT limitations / not yet production-ready
-**The 85% death condition is NOT implemented to the exact requested specification.** The server currently uses a **510-tick / 85%-of-cycle timer**, not GPU measured pixel coverage. The shader uses probabilistic visible screen-space restoration, so 85% is only expected approximately. This is **not an exact measure of the whole Minecraft world**. The entire persistent world's visual-color coverage cannot be calculated merely by observing the frame. The game server and shader are also not perfectly synchronized (daylight cycle, pause, time commands). **This is an experimental prototype.**
+Fixed:
+- GameRenderer no longer reinstalls the post-processing effect on **every single rendered frame**.
+- Removed the timer-based player kill that falsely claimed to implement 85% color restoration.
+- Retained instant grayscale-to-color shader prototype and 45% original/55% random RGB-key selection.
 
-The shader runs as a Minecraft 1.21.2 post-effect. It does not tint the HUD, and the grouping is based on sampled source colors rather than block or biome types. Some post-effect mods may conflict. In-game and build testing have NOT been completed.
+Not fixed / not implemented:
+- The first 30 seconds must stay fully colored.
+- Real, independent 30-second grayscale resets; the shader still uses the Minecraft day clock.
+- Block/material semantic color groups (e.g. every grass or tree of matching original colors).
+- Exact 85% of visual-world color coverage measured by the renderer and triggering death.
+- Synchronizing restoration across multiplayer clients or covering HUD/UI.
+- In-game verification. A successful GitHub Actions build verifies **compilation only**.
 
-## Build
-Requires Java 21. Install Gradle 8.10+ or add a Gradle wrapper, then run `gradle build`. The jar should appear in `build/libs`. Install Fabric Loader 1.21.2 and place the jar in `mods`.
+Run the automated build under **Actions** in this repository and inspect the log before installing the jar. Requires Java 21, Fabric Loader and Fabric API for Minecraft 1.21.2. GitHub Actions uploads a jar artifact on success.
 
-Sources: https://www.minecraft.net/en-us/article/minecraft-java-edition-1-21-2 and https://fabricmc.net/2024/10/14/1212.html
+Minecraft 1.21.2 post-processing technical specification:
+https://www.minecraft.net/en-us/article/minecraft-java-edition-1-21-2
