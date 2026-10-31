@@ -1,22 +1,21 @@
-# COLOR-BIGWORLD — Fabric 1.21.2
+# COLOR-BIGWORLD — Material color-state engine (incomplete)
 
-## Repair status
-This is an **experimental prototype, not the fully requested mod**.
+This branch adds a Java 21 **render-independent state engine** and a verified standalone test. It does NOT yet make gameplay behave as requested.
 
-Fixed:
-- GameRenderer no longer reinstalls the post-processing effect on **every single rendered frame**.
-- Removed the timer-based player kill that falsely claimed to implement 85% color restoration.
-- Retained instant grayscale-to-color shader prototype and 45% original/55% random RGB-key selection.
+Implemented in the engine:
+- Separate registry keys for block types, sky, and water (e.g., `block:minecraft:grass_block`, `sky:overworld`, `fluid:minecraft:water`).
+- 45% original or 55% randomized hue for each group, stable during a cycle.
+- Different random hue at least 30 degrees away from the original.
+- State reset after every 600 engine ticks.
+- Area-weighted 85% threshold based on **provided actual visible area** rather than group count.
+- A death signal that fires at most once per cycle.
 
-Not fixed / not implemented:
-- The first 30 seconds must stay fully colored.
-- Real, independent 30-second grayscale resets; the shader still uses the Minecraft day clock.
-- Block/material semantic color groups (e.g. every grass or tree of matching original colors).
-- Exact 85% of visual-world color coverage measured by the renderer and triggering death.
-- Synchronizing restoration across multiplayer clients or covering HUD/UI.
-- In-game verification. A successful GitHub Actions build verifies **compilation only**.
+**Still required before playable:** Hook the engine to Fabric client ticks, render all block materials as a solid uniform color, handle sky/water/other entities separately, measure actual visible screen coverage from the renderer, invoke gameplay death safely through server logic, add normal-color startup, synchronize the visual cycle, and test in-game.
 
-Run the automated build under **Actions** in this repository and inspect the log before installing the jar. Requires Java 21, Fabric Loader and Fabric API for Minecraft 1.21.2. GitHub Actions uploads a jar artifact on success.
+Important: no GPU sampling or block-ID renderer integration has been built yet. Existing post-effect in this branch remains the earlier experimental shader. This is not a finished mod.
 
-Minecraft 1.21.2 post-processing technical specification:
-https://www.minecraft.net/en-us/article/minecraft-java-edition-1-21-2
+Standalone test (Java 21):
+```
+javac -d tmp src/main/java/dev/bigworld/engine/ColorEngine.java src/test/java/dev/bigworld/engine/ColorEngineCheck.java
+java -cp tmp dev.bigworld.engine.ColorEngineCheck
+```
